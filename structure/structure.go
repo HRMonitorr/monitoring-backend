@@ -1,5 +1,7 @@
 package structure
 
+import "time"
+
 type CommitsTotal struct {
 	EmployeeName string    `json:"employee-name" bson:"employee-name"`
 	Commit       []Commits `json:"commit" bson:"commit"`
@@ -7,9 +9,11 @@ type CommitsTotal struct {
 }
 
 type Commits struct {
-	Author  string `bson:"author" json:"author"`
-	Email   string `json:"email" bson:"email"`
-	Comment string `bson:"comment" json:"comment" `
+	Author  string    `bson:"author" json:"author"`
+	Repos   string    `bson:"repos" json:"repos"`
+	Email   string    `json:"email" bson:"email"`
+	Comment string    `bson:"comment" json:"comment" `
+	Date    time.Time `json:"date" bson:"date"`
 }
 
 type Creds struct {

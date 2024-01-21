@@ -10,6 +10,7 @@ import (
 	"github.com/HRMonitorr/monitoring-backend/structure"
 	"net/http"
 	"os"
+	"time"
 )
 
 func GetDataCommitsAll(PublicKey, MongoEnv, dbname, colname, personalToken string, r *http.Request) string {
@@ -40,14 +41,35 @@ func GetDataCommitsAll(PublicKey, MongoEnv, dbname, colname, personalToken strin
 				req.Status = http.StatusNotAcceptable
 				req.Message = "Data User tidak ada"
 			} else {
-				datacomms, err := githubwrapper.ListCommitALL(context.Background(), personalToken, datauser.RepoName, datauser.OwnerName)
+				datacomms, err := githubwrapper.ListCommitALL(context.Background(), os.Getenv(personalToken), datauser.RepoName, datauser.OwnerName)
+				if err != nil {
+					req.Status = http.StatusBadRequest
+					req.Message = err.Error()
+				}
+				if len(datacomms) == 0 {
+					req.Status = http.StatusNotAcceptable
+					req.Message = "data tidak ditemukan"
+				}
+				datas := make([]structure.Commits, 0)
+				for _, v := range datacomms {
+					data := structure.Commits{
+						Author:  *v.Author.Name,
+						Repos:   *v.Commit.URL,
+						Email:   *v.Author.Email,
+						Comment: *v.Commit.Message,
+						Date:    time.Now(),
+					}
+					datas = append(datas, data)
+				}
+
+				_, err = InsertCommitsManyToDB(conn, datas)
 				if err != nil {
 					req.Status = http.StatusBadRequest
 					req.Message = err.Error()
 				}
 				req.Status = http.StatusOK
 				req.Message = fmt.Sprintf("data Commit berhasil diambil"+
-					"body : %+v\n", datauser)
+					"body : %+v\n ins : %d", datauser, len(datas))
 				req.Data = datacomms
 			}
 		}
