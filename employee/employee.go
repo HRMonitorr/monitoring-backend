@@ -69,7 +69,7 @@ func GetDataCommitsAll(PublicKey, MongoEnv, dbname, colname, personalToken strin
 				}
 				req.Status = http.StatusOK
 				req.Message = fmt.Sprintf("data Commit berhasil diambil"+
-					"body : %+v\n ins : %d", datauser, len(datas))
+					"body : %+v\n %+v ", datauser.RepoName, datauser.OwnerName)
 				req.Data = datacomms
 			}
 		}
