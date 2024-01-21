@@ -9,11 +9,11 @@ type CommitsTotal struct {
 }
 
 type Commits struct {
-	Author  string    `bson:"author" json:"author"`
-	Repos   string    `bson:"repos" json:"repos"`
-	Email   string    `json:"email" bson:"email"`
-	Comment string    `bson:"comment" json:"comment" `
-	Date    time.Time `json:"date" bson:"date"`
+	Author  *string   `bson:"author" json:"author"`
+	Repos   *string   `bson:"repos" json:"repos"`
+	Email   *string   `json:"email" bson:"email"`
+	Comment *string   `bson:"comment" json:"comment" `
+	Date    time.Time `json:"date" bson:"date,omitempty"`
 }
 
 type Creds struct {

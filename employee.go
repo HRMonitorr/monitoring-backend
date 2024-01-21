@@ -3,7 +3,6 @@ package monitoring_backend
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/HRMonitorr/PasetoprojectBackend"
 	"github.com/HRMonitorr/githubwrapper"
 	"github.com/HRMonitorr/monitoring-backend/structure"
@@ -33,17 +32,16 @@ func GetDataCommitsAll(MongoEnv, dbname, personalToken string, r *http.Request) 
 				req.Status = http.StatusNotAcceptable
 				req.Message = "data tidak ditemukan"
 			}
-			//datas := make([]structure.Commits, 0)
-			//for _, v := range datacomms {
-			//	data := structure.Commits{
-			//		Author:  *v.Author.Name,
-			//		Repos:   *v.Commit.URL,
-			//		Email:   *v.Author.Email,
-			//		Comment: *v.Commit.Message,
-			//		Date:    time.Now(),
-			//	}
-			//	datas = append(datas, data)
-			//}
+			datas := make([]structure.Commits, 0)
+			for _, v := range datacomms {
+				data := structure.Commits{
+					Author:  v.Commit.Author.Name,
+					Repos:   v.Commit.URL,
+					Email:   v.Commit.Author.Email,
+					Comment: v.Commit.Message,
+				}
+				datas = append(datas, data)
+			}
 			//
 			//_, err = employee.InsertCommitsManyToDB(conn, datas)
 			//if err != nil {
@@ -51,9 +49,8 @@ func GetDataCommitsAll(MongoEnv, dbname, personalToken string, r *http.Request) 
 			//	req.Message = err.Error()
 			//}
 			req.Status = http.StatusOK
-			req.Message = fmt.Sprintf("data Commit berhasil diambil"+
-				"%s ", os.Getenv(personalToken))
-			req.Data = datacomms
+			req.Message = "data Commit berhasil diambil"
+			req.Data = datas
 		}
 	}
 	return PasetoprojectBackend.ReturnStringStruct(req)
