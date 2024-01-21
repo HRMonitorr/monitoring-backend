@@ -46,8 +46,8 @@ func GetDataCommitsAll(PublicKey, MongoEnv, dbname, colname, personalToken strin
 					req.Message = err.Error()
 				}
 				req.Status = http.StatusOK
-				req.Message = fmt.Sprintf("data Commit berhasil diambil %v\n"+
-					"body : %+v\n", datacomms[0].Commit, datauser)
+				req.Message = fmt.Sprintf("data Commit berhasil diambil"+
+					"body : %+v\n", datauser)
 				req.Data = datacomms
 			}
 		}
