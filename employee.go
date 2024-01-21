@@ -6,16 +6,14 @@ import (
 	"fmt"
 	"github.com/HRMonitorr/PasetoprojectBackend"
 	"github.com/HRMonitorr/githubwrapper"
-	"github.com/HRMonitorr/monitoring-backend/employee"
 	"github.com/HRMonitorr/monitoring-backend/structure"
 	"net/http"
 	"os"
-	"time"
 )
 
-func GetDataCommitsAll(PublicKey, MongoEnv, dbname, colname, personalToken string, r *http.Request) string {
+func GetDataCommitsAll(MongoEnv, dbname, personalToken string, r *http.Request) string {
 	req := new(structure.Creds)
-	conn := PasetoprojectBackend.MongoCreateConnection(MongoEnv, dbname)
+	//conn := PasetoprojectBackend.MongoCreateConnection(MongoEnv, dbname)
 	var datauser structure.BodyReq
 	err := json.NewDecoder(r.Body).Decode(&datauser)
 	if err != nil {
@@ -35,27 +33,27 @@ func GetDataCommitsAll(PublicKey, MongoEnv, dbname, colname, personalToken strin
 				req.Status = http.StatusNotAcceptable
 				req.Message = "data tidak ditemukan"
 			}
-			datas := make([]structure.Commits, 0)
-			for _, v := range datacomms {
-				data := structure.Commits{
-					Author:  *v.Author.Name,
-					Repos:   *v.Commit.URL,
-					Email:   *v.Author.Email,
-					Comment: *v.Commit.Message,
-					Date:    time.Now(),
-				}
-				datas = append(datas, data)
-			}
-
-			_, err = employee.InsertCommitsManyToDB(conn, datas)
-			if err != nil {
-				req.Status = http.StatusBadRequest
-				req.Message = err.Error()
-			}
+			//datas := make([]structure.Commits, 0)
+			//for _, v := range datacomms {
+			//	data := structure.Commits{
+			//		Author:  *v.Author.Name,
+			//		Repos:   *v.Commit.URL,
+			//		Email:   *v.Author.Email,
+			//		Comment: *v.Commit.Message,
+			//		Date:    time.Now(),
+			//	}
+			//	datas = append(datas, data)
+			//}
+			//
+			//_, err = employee.InsertCommitsManyToDB(conn, datas)
+			//if err != nil {
+			//	req.Status = http.StatusBadRequest
+			//	req.Message = err.Error()
+			//}
 			req.Status = http.StatusOK
 			req.Message = fmt.Sprintf("data Commit berhasil diambil"+
 				"%s ", os.Getenv(personalToken))
-			req.Data = datas
+			req.Data = datacomms
 		}
 	}
 	return PasetoprojectBackend.ReturnStringStruct(req)
