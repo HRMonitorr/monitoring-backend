@@ -3,6 +3,7 @@ package employee
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/HRMonitorr/PasetoprojectBackend"
 	"github.com/HRMonitorr/UsersBackend"
 	"github.com/HRMonitorr/githubwrapper"
@@ -45,7 +46,8 @@ func GetDataCommitsAll(PublicKey, MongoEnv, dbname, colname, personalToken strin
 					req.Message = err.Error()
 				}
 				req.Status = http.StatusOK
-				req.Message = "data User berhasil diambil"
+				req.Message = fmt.Sprintf("data Commit berhasil diambil %v\n"+
+					"body : %+v\n", datacomms[0].Commit, datauser)
 				req.Data = datacomms
 			}
 		}
