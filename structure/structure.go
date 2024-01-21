@@ -17,3 +17,8 @@ type Creds struct {
 	Message string      `json:"message" bson:"message"`
 	Data    interface{} `json:"data" bson:"data"`
 }
+
+type BodyReq struct {
+	OwnerName string `json:"ownerName"`
+	RepoName  string `json:"repoName"`
+}
