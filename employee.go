@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/HRMonitorr/PasetoprojectBackend"
-	"github.com/HRMonitorr/UsersBackend"
 	"github.com/HRMonitorr/githubwrapper"
 	"github.com/HRMonitorr/monitoring-backend/employee"
 	"github.com/HRMonitorr/monitoring-backend/structure"
@@ -27,54 +26,37 @@ func GetDataCommitsAll(PublicKey, MongoEnv, dbname, colname, personalToken strin
 			req.Status = http.StatusNotAcceptable
 			req.Message = "Header Login Not Found"
 		} else {
-			cekadmin := UsersBackend.IsAdmin(tokenlogin, PublicKey)
-			if cekadmin != true {
-				req.Status = http.StatusNotAcceptable
-				req.Message = "IHHH Kamu bukan admin"
-			}
-			checktoken, err := PasetoprojectBackend.DecodeGetUser(os.Getenv(PublicKey), tokenlogin)
+			datacomms, err := githubwrapper.ListCommitALL(context.Background(), os.Getenv(personalToken), "UsersBackend", "HRMonitorr")
 			if err != nil {
-				req.Status = http.StatusNotAcceptable
-				req.Message = "tidak ada data username : " + tokenlogin
+				req.Status = http.StatusBadRequest
+				req.Message = err.Error()
 			}
-			compared := PasetoprojectBackend.CompareUsername(conn, colname, checktoken)
-			if compared != true {
+			if len(datacomms) == 0 {
 				req.Status = http.StatusNotAcceptable
-				req.Message = "Data User tidak ada"
-			} else {
-				datacomms, err := githubwrapper.ListCommitALL(context.Background(), os.Getenv(personalToken), "UsersBackend", "HRMonitorr")
-				if err != nil {
-					req.Status = http.StatusBadRequest
-					req.Message = err.Error()
+				req.Message = "data tidak ditemukan"
+			}
+			datas := make([]structure.Commits, 0)
+			for _, v := range datacomms {
+				data := structure.Commits{
+					Author:  *v.Author.Name,
+					Repos:   *v.Commit.URL,
+					Email:   *v.Author.Email,
+					Comment: *v.Commit.Message,
+					Date:    time.Now(),
 				}
-				if len(datacomms) == 0 {
-					req.Status = http.StatusNotAcceptable
-					req.Message = "data tidak ditemukan"
-				}
-				datas := make([]structure.Commits, 0)
-				for _, v := range datacomms {
-					data := structure.Commits{
-						Author:  *v.Author.Name,
-						Repos:   *v.Commit.URL,
-						Email:   *v.Author.Email,
-						Comment: *v.Commit.Message,
-						Date:    time.Now(),
-					}
-					datas = append(datas, data)
-				}
+				datas = append(datas, data)
+			}
 
-				_, err = employee.InsertCommitsManyToDB(conn, datas)
-				if err != nil {
-					req.Status = http.StatusBadRequest
-					req.Message = err.Error()
-				}
-				req.Status = http.StatusOK
-				req.Message = fmt.Sprintf("data Commit berhasil diambil"+
-					"%s ", os.Getenv(personalToken))
-				req.Data = datas
+			_, err = employee.InsertCommitsManyToDB(conn, datas)
+			if err != nil {
+				req.Status = http.StatusBadRequest
+				req.Message = err.Error()
 			}
+			req.Status = http.StatusOK
+			req.Message = fmt.Sprintf("data Commit berhasil diambil"+
+				"%s ", os.Getenv(personalToken))
+			req.Data = datas
 		}
 	}
-
 	return PasetoprojectBackend.ReturnStringStruct(req)
 }
