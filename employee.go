@@ -23,7 +23,7 @@ func GetDataCommitsAll(MongoEnv, dbname, personalToken string, r *http.Request) 
 			req.Status = http.StatusNotAcceptable
 			req.Message = "Header Login Not Found"
 		} else {
-			datacomms, err := githubwrapper.ListCommitALL(context.Background(), os.Getenv(personalToken), "UsersBackend", "HRMonitorr")
+			datacomms, err := githubwrapper.ListCommitALL(context.Background(), os.Getenv(personalToken), datauser.RepoName, datauser.OwnerName)
 			if err != nil {
 				req.Status = http.StatusBadRequest
 				req.Message = err.Error()
