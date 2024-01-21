@@ -1,4 +1,4 @@
-package employee
+package monitoring_backend
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"github.com/HRMonitorr/PasetoprojectBackend"
 	"github.com/HRMonitorr/UsersBackend"
 	"github.com/HRMonitorr/githubwrapper"
+	"github.com/HRMonitorr/monitoring-backend/employee"
 	"github.com/HRMonitorr/monitoring-backend/structure"
 	"net/http"
 	"os"
@@ -41,7 +42,7 @@ func GetDataCommitsAll(PublicKey, MongoEnv, dbname, colname, personalToken strin
 				req.Status = http.StatusNotAcceptable
 				req.Message = "Data User tidak ada"
 			} else {
-				datacomms, _, err := githubwrapper.MakeClient(personalToken).Repositories.ListCommits(context.Background(), datauser.OwnerName, datauser.RepoName, nil)
+				datacomms, err := githubwrapper.ListCommitALL(context.Background(), os.Getenv(personalToken), "UsersBackend", "HRMonitorr")
 				if err != nil {
 					req.Status = http.StatusBadRequest
 					req.Message = err.Error()
@@ -62,7 +63,7 @@ func GetDataCommitsAll(PublicKey, MongoEnv, dbname, colname, personalToken strin
 					datas = append(datas, data)
 				}
 
-				_, err = InsertCommitsManyToDB(conn, datas)
+				_, err = employee.InsertCommitsManyToDB(conn, datas)
 				if err != nil {
 					req.Status = http.StatusBadRequest
 					req.Message = err.Error()
