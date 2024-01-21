@@ -41,7 +41,7 @@ func GetDataCommitsAll(PublicKey, MongoEnv, dbname, colname, personalToken strin
 				req.Status = http.StatusNotAcceptable
 				req.Message = "Data User tidak ada"
 			} else {
-				datacomms, err := githubwrapper.ListCommitALL(context.Background(), os.Getenv(personalToken), datauser.RepoName, datauser.OwnerName)
+				datacomms, _, err := githubwrapper.MakeClient(os.Getenv(personalToken)).Repositories.ListCommits(context.Background(), datauser.OwnerName, datauser.RepoName, nil)
 				if err != nil {
 					req.Status = http.StatusBadRequest
 					req.Message = err.Error()
